@@ -1,20 +1,27 @@
 pipeline {
-  agent any
-  environment {
-    ANSIBLE_FORCE_COLOR = 'true'
-  }
-  stages {
-    stage('Checkout Source') {
-      steps {
-        git branch: 'main', url: 'https://github.com/devipebiyanti13/infra-ansible-jenkins.git'
-      }
+    agent any
+    environment {
+        ANSIBLE_FORCE_COLOR = 'true'
     }
-    stage('Run Ansible Playbook') {
-      steps {
-        sshagent(['ansible-ssh-key']) {
-          sh 'ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini deploy.yml --become --ask-become-pass|| exit 1'
+    stages {
+        stage('Checkout Source') {
+            steps {
+                git branch: 'main', url: 'https://github.com/devipebiyanti13/infra-ansible-jenkins.git'
+            }
         }
-      }
+
+        stage('Print Working Directory') {
+            steps {
+                sh 'pwd && ls -lah'
+            }
+        }
+        
+        stage('Run Ansible Playbook') {
+            steps {
+                sshagent(['ansible-ssh-key']) {
+                    sh 'ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i host.ini deploy.yml --become --ask-become-pass|| exit 1'
+                }
+            }
+        }
     }
-  }
 }
